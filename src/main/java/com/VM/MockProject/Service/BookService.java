@@ -3,7 +3,7 @@ package com.VM.MockProject.Service;
 import com.VM.MockProject.Entity.Book;
 
 import com.VM.MockProject.Repository.IBookRepository;
-import jakarta.persistence.criteria.Predicate;
+import com.VM.MockProject.Specification.BookSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,25 +43,7 @@ public class BookService implements IBookService {
 
     @Override
     public List<Book> searchBooks(String title, String author, String genre, Integer publicationYear) {
-        // Logic tìm kiếm sách theo các tiêu chí, có thể sử dụng Specification hoặc các phương thức query trong repository
-        // Ví dụ:
-        return bookRepository.findAll((root, query, builder) -> {
-            Predicate p = builder.conjunction();
-            if (title != null && !title.isEmpty()) {
-                p = builder.and(p, builder.like(root.get("title"), "%" + title + "%"));
-            }
-            if (author != null && !author.isEmpty()) {
-                p = builder.and(p, builder.like(root.get("author"), "%" + author + "%"));
-            }
-            if (genre != null && !genre.isEmpty()) {
-                p = builder.and(p, builder.like(root.get("genre"), "%" + genre + "%"));
-            }
-            if (publicationYear != null) {
-                p = builder.and(p, builder.equal(root.get("publicationYear"), publicationYear));
-            }
-            return p;
-        });
-
+        return bookRepository.findAll(BookSpecification.getBooksBySpecification(title, author, genre, publicationYear));
     }
     @Override
     public Optional<Book> getBookById(Integer bookId) {
